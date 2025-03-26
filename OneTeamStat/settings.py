@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # My Applications
-    'core.apps.CoreConfig',
+    'core',
     
     # Third party frameworks
     'rest_framework',
@@ -43,13 +43,18 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # Custom middleware for cookie authentication
+    'core.middleware.CookieJWTAuthMiddleware',
+
+    # Djago Middlewares
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'OneTeamStat.urls'
@@ -75,8 +80,29 @@ WSGI_APPLICATION = 'OneTeamStat.wsgi.application'
 
 REST_FRAMEWORK = {
       'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+          # Custom django restframework-simple JWT Cookie based authentication
+        'core.authentication.CustomCookieJWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
       ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+ 
+    "AUTH_HEADER_TYPES": ("Bearer", ),
+
+    "AUTH_COOKIE": "access_token",
+    "AUTH_COOKIE_SECURE": True,
+    "AUTH_COOKIE_PATH": "/",
+    "AUTH_COOKIE_SAMESITE": "Strict",
+    "AUTH_COOKIE_HTTP_ONLY": True,
+
+    "access_token": "access_token",
+    "refresh_token": "refresh_token",
+    
+    # Custom Token Claim which adds username, email and role
+    "TOKEN_OBTAIN_SERIALIZER": "core.CustomTokenClaim.MyTokenObtainPairSerializer",
 }
 
 # Database
@@ -136,11 +162,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Custom User Model
 AUTH_USER_MODEL = 'core.MyUser'
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-
-    "TOKEN_OBTAIN_SERIALIZER": "core.CustomTokenClaim.MyTokenObtainPairSerializer",
-}
