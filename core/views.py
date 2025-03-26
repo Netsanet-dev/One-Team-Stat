@@ -1,69 +1,77 @@
 # from rest_framework.parsers import JSONParser
+import logging
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes
 
-from .permissions import IsCoachUser, IsRegularUser, IsPlayerUser,IsAdminUser
 from .serializers import (
     UserRegistrationSerializer,
-    UserLoginSerializer,
     UserProfileUpdate, 
-    UserPasswordChangeSerializer
+    UpdatePasswordSerialzier
 )
-
 
 # Get the Custom User Model
 MyUser = get_user_model()
-
-
-# Access and refresh token for a requested user
-def get_token_for_user(user):
-    refresh = RefreshToken.for_user(user)
-    return {
-        'refresh' : str(refresh),
-        'access' : str(refresh.access_token)
-    }
+logger = logging.getLogger(__name__)
 
 
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
 def register_user(request):
-    """
-    User Registration
-    """
     serializer = UserRegistrationSerializer(data=request.data)
-
     if serializer.is_valid():
-        user = serializer.save()
-        token = get_token_for_user(user)
-        return Response({'user':serializer.data, 'token': token}, status=status.HTTP_201_CREATED)
+        serializer.save()
+        return Response({'User': serializer.data}, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST', 'GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def login_user(request):
     username = request.data.get('username')
     password = request.data.get('password')
     
     if not username or not password:
-        return Response({'error' : "Invalid Account"})
+        return Response({'Message' : "Invalid Username or Password"})
 
     user = authenticate(request, username=username, password=password)
     
-    if user is not None:
-        token = get_token_for_user(user)
-        user_serilaizer = UserLoginSerializer(user)
-        return Response({'user': user_serilaizer.data, 'token': token}, status=status.HTTP_200_OK)
-    return Response({'error': 'Invalid'},status=status.HTTP_401_UNAUTHORIZED)
+    if user:
+        try:
+            refresh = RefreshToken.for_user(user)
+
+            response = Response({"Message" : "Login Successful."}, status=status.HTTP_200_OK)
+            
+            response.set_cookie(
+                key=settings.SIMPLE_JWT["access_token"], 
+                value=str(refresh.access_token), 
+                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+                path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'] )
+            
+            response.set_cookie(
+                key=settings.SIMPLE_JWT["refresh_token"], 
+                value=str(refresh), 
+                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+                path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'],
+            )    
+            return response
+        
+        except Exception as e:
+            logger.error(f"Error during login: {e}")
+            return Response({"Message": "Internal Server Error."})
+    return Response({'Message': "Incorrect Username or Password"},status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -74,27 +82,46 @@ def logout_user(request):
         token = RefreshToken(refresh_token)
         token.blacklist()
 
-        return Response({'message': 'Logout Successful'}, status=status.HTTP_200_OK)
+        response = Response({'message': 'Logout Successful'}, status=status.HTTP_200_OK)
+        
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+        
+        return response
 
     except Exception as e:
-        return Response({'refresh token': f'{refresh_token}'},status=status.HTTP_400_BAD_REQUEST)
+        logger.error(f"Logout error: {e}")
+        return Response({'refresh token': f"{refresh_token}"},status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated, IsPlayerUser])
+@permission_classes([IsAuthenticated])
 def protected_view(request):
     user = request.user
-    return Response({"Message": f"{user.username} Congratulations You are seeing this."})
-
+    if user:
+        return Response({"Message": f"{user.username} Congratulations You are seeing this."})
+    return Response({"Message": "Unauthorized"}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_user_info(request):
     user = request.user
     serializer = UserProfileUpdate(user, data=request.data, partial=True)
-    if serializer.is_valid():
+
+    if serializer.is_valid() and not None:
         serializer.validated_data.pop('password', None)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)    
+        return Response(serializer.data, status=status.HTTP_200_OK)    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_password(request):
+    serializer = UpdatePasswordSerialzier(data=request.data, context={'request' : request})
+    user = request.user
+    if serializer.is_valid():
+        user.set_password(serializer.validated_data['confirm_password'])
+        user.save()
+        return Response({"Message": "Password Changed Successfully."}, status=status.HTTP_200_OK)
+    return Response({"user": user.username, "error" : serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
