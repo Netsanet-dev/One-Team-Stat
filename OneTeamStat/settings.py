@@ -33,7 +33,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # My Applications
-    'core',
+    'core.apps.CoreConfig',
+    'football.apps.FootballConfig',
     
     # Third party frameworks
     'rest_framework',

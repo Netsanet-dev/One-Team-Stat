@@ -3,3 +3,4 @@ djangorestframework
 python-dotenv
 djangorestframework-simplejwt
 psycopg2
+pillow
