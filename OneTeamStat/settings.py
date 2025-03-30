@@ -34,7 +34,8 @@ INSTALLED_APPS = [
 
     # My Applications
     'core.apps.CoreConfig',
-    'football.apps.FootballConfig',
+    'gamecore.apps.GamecoreConfig',
+    'games.apps.GamesConfig',
     
     # Third party frameworks
     'rest_framework',
