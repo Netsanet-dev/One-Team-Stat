@@ -7,8 +7,7 @@ from .models import (
     Team,
     Coach,
     Player, 
-    Referee,
-    PlayerStat)
+    Referee)
 
 class LeagueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,7 +24,7 @@ class StadiumSerializer(serializers.ModelSerializer):
 class SeasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Season
-        fields = ['league_id', 'start', 'end', 'current']
+        fields = ['id', 'league_id', 'start', 'end', 'current']
 
 
 class ClubSerializer(serializers.ModelSerializer):
@@ -55,11 +54,6 @@ class PlayerSerializer(serializers.ModelSerializer):
 class RefereeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Referee
-        fields = ['id', 'first_name', 'last_name', 'nationality', 'date_of_birth', 'gender', 'current_league', 'referee_level']
+        fields = ['id', 'first_name', 'last_name', 'nationality', 'age', 'gender', 'current_league', 'referee_level']
         depth = 1
-class PlayerStatSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PlayerStat
-        fields = ['id', 'player', 'date', 'appearances', 'minutes_played', 'goals', 'assists', 'yellow_cards', 'red_cards']
-        depth = 4
 

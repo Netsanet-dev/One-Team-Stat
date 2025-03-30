@@ -1,6 +1,6 @@
 from rest_framework import  viewsets
 from rest_framework.permissions import IsAuthenticated
-from .models import League, Stadium, Season, Club, Team, Coach, Player, Referee, PlayerStat
+from .models import League, Stadium, Season, Club, Team, Coach, Player, Referee
 from .serializers import (
     LeagueSerializer,
     StadiumSerializer,
@@ -9,8 +9,7 @@ from .serializers import (
     TeamSerializer,
     CoachSerializer,
     PlayerSerializer,
-    RefereeSerializer,
-    PlayerStatSerializer
+    RefereeSerializer
 )
 
 # Create your views here.
@@ -61,7 +60,3 @@ class RefereeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-class PlayerSatatViewSet(viewsets.ModelViewSet):
-    queryset = PlayerStat.objects.all()
-    serializer_class = PlayerStatSerializer
-    permission_classes = [IsAuthenticated]

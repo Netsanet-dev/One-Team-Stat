@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import League, Season, Club, Player, Coach, Team, PlayerStat, Stadium, Referee
+from .models import League, Season, Club, Player, Coach, Team, Stadium, Referee
 
 # Register your models here.
 @admin.register(League)
@@ -35,8 +35,4 @@ class PlayerAdmin(admin.ModelAdmin):
 
 @admin.register(Referee)
 class RefereeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'first_name', 'last_name', 'nationality', 'date_of_birth', 'gender', 'current_league', 'referee_level']
-
-@admin.register(PlayerStat)
-class PlayerStatAdmin(admin.ModelAdmin):
-    list_display = ['id', 'player', 'date', 'appearances', 'minutes_played', 'goals', 'assists', 'yellow_cards', 'red_cards']
+    list_display = ['id', 'first_name', 'last_name', 'nationality', 'age', 'gender', 'current_league', 'referee_level']
