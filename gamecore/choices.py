@@ -20,6 +20,7 @@ class DominantFoot(models.TextChoices):
     LEFT = 'left', 'Left',
 
 class Gender(models.TextChoices):
+    UNSPECIFIED = 'unspecified', 'Unspecified'
     MALE = 'M', 'Male',
     FEMALE = 'F', 'Female',
 
