@@ -14,7 +14,7 @@ router.register(r'player' , views.PlayerViewSet)
 router.register(r'referee' , views.RefereeViewSet)
 
 
-urlpatterns = [
-    path('', include(router.urls))
+urlpatterns =[
+    path('api/gamecore/', include(router.urls))
 ]
 
