@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '172.17.0.1', 'localhost']
 
 
 # Application definition
@@ -91,7 +91,10 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
- 
+
+    "SIGINING_KEY": os.getenv('DJANGO_SECRET_KEY'),
+    "VERIFYING_KEY": None,
+
     "AUTH_HEADER_TYPES": ("Bearer", ),
 
     "AUTH_COOKIE": "access_token",
@@ -116,8 +119,8 @@ DATABASES = {
         'NAME': os.getenv('PGNAME'),
         'USER' : os.getenv('PGUSER'),
         'PASSWORD' : os.getenv('PGPASSWORD'),
-        'HOST' : 'localhost',
-        'PORT' : '5432'
+        'HOST' : os.getenv('PGHOST'),
+        'PORT' : os.getenv('PGPORT', '5432')
 
     }
 }
@@ -157,7 +160,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
