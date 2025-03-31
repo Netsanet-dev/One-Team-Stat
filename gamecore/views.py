@@ -1,6 +1,6 @@
 from rest_framework import  viewsets
 from rest_framework.permissions import IsAuthenticated
-from .models import League, Stadium, Season, Club, Team, Coach, Player, Referee
+from .models import Referee, League, Stadium, Season, Club, Team, Coach, Player
 from .serializers import (
     LeagueSerializer,
     StadiumSerializer,
