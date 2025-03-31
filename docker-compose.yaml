@@ -1,0 +1,18 @@
+services:
+  web:
+    build:
+      context: .
+    ports: 
+      - "8080:8000"
+    volumes:
+       - ./core:/app/core
+       - ./games:/app/games
+       - ./gamestat:/app/gamestat
+       - ./OneTeamStat:/app/OneTeamStat
+    environment:
+      PGHOST: $PGHOST
+      PGPORT: $PGPORT
+      PGUSER: $PGUSER
+      PGPASSWORD: $PGPASSWORD
+      PGNAME: $PGNAME
+      DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
