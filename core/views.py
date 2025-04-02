@@ -1,5 +1,6 @@
 # from rest_framework.parsers import JSONParser
 import logging
+
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -19,6 +20,7 @@ from .serializers import (
 
 # Get the Custom User Model
 MyUser = get_user_model()
+
 logger = logging.getLogger(__name__)
 
 
@@ -41,17 +43,21 @@ def login_user(request):
     
     if not username or not password:
         return Response({'Message' : "Invalid Username or Password"})
-
-    user = authenticate(request, username=username, password=password)
     
+    user = authenticate(request, username=username, password=password)
+
     if user:
         try:
             refresh = RefreshToken.for_user(user)
-
-            response = Response({"Message" : "Login Successful."}, status=status.HTTP_200_OK)
+            
+            response = Response({
+                "Message" : "Login Successful.",
+                "access_token" : str(refresh.access_token),
+                "refresh_token" : str(refresh),
+                }, status=status.HTTP_200_OK)
             
             response.set_cookie(
-                key=settings.SIMPLE_JWT["access_token"], 
+                key=settings.SIMPLE_JWT["AUTH_COOKIE"], 
                 value=str(refresh.access_token), 
                 secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
                 httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
@@ -59,7 +65,7 @@ def login_user(request):
                 path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'] )
             
             response.set_cookie(
-                key=settings.SIMPLE_JWT["refresh_token"], 
+                key=settings.SIMPLE_JWT["AUTH_COOKIE_REFRESH"], 
                 value=str(refresh), 
                 secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
                 httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
@@ -70,20 +76,48 @@ def login_user(request):
         
         except Exception as e:
             logger.error(f"Error during login: {e}")
-            return Response({"Message": "Internal Server Error."})
+            return Response({"Message": "Internal Server Error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response({'Message': "Incorrect Username or Password"},status=status.HTTP_401_UNAUTHORIZED)
 
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def refresh_token_view(request):
+    try:
+        refresh_token = request.COOKIES.get("refresh_token")
+        if refresh_token is None:
+            return Response({"Error Message": "No Refresh Token Found"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        refresh = RefreshToken(refresh_token)
+        access_token = str(refresh.access_token)
 
-@api_view(['POST'])
+        response = Response({"Message": "Token Refreshed Successfully", "access_token": access_token}, status=status.HTTP_200_OK)
+        response.set_cookie(
+                key=settings.SIMPLE_JWT["AUTH_COOKIE"], 
+                value=str(refresh.access_token), 
+                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+                path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'] )
+        print(response)
+        return response
+    except Exception as e:
+        logger.error(f"Error during token refresh: {e}")
+        return Response({"Message": "Invalid Token"}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def logout_user(request):
     try:
-        refresh_token = request.data["refresh"]
+        refresh_token = request.COOKIES.get('refresh_token')
+
+        if not refresh_token:
+            return Response({'Message': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
         token = RefreshToken(refresh_token)
         token.blacklist()
-
-        response = Response({'message': 'Logout Successful'}, status=status.HTTP_200_OK)
         
+        response = Response({'message': 'Logout Successful'}, status=status.HTTP_200_OK)
+
         response.delete_cookie('access_token')
         response.delete_cookie('refresh_token')
         
@@ -91,7 +125,7 @@ def logout_user(request):
 
     except Exception as e:
         logger.error(f"Logout error: {e}")
-        return Response({'refresh token': f"{refresh_token}"},status=status.HTTP_400_BAD_REQUEST)
+        return Response({"Message": "Invalid token or logout error."},status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
