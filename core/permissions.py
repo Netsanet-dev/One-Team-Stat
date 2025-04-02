@@ -1,19 +1,19 @@
 from rest_framework import permissions
-from .models import USER_ROLE_USER, USER_ROLE_ADMIN, USER_ROLE_COACH, USER_ROLE_PLAYER
+from .models import UserRole
 
 
-class IsAdminUser(permissions.BasePermission):
+class IsLeagueAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == USER_ROLE_ADMIN
+        return request.user and request.user.is_authenticated and request.user.role == UserRole.LEAGUE_ADMIN
 
-class IsPlayerUser(permissions.BasePermission):
+class IsClubAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == USER_ROLE_PLAYER
+        return request.user and request.user.is_authenticated and request.user.role == UserRole.CLUB_ADMIN
 
-class IsCoachUser(permissions.BasePermission):
+class IsTeamAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == USER_ROLE_COACH
+        return request.user and request.user.is_authenticated and request.user.role == UserRole.TEAM_ADMIN
 
 class IsRegularUser(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == USER_ROLE_USER
+        return request.user and request.user.is_authenticated and request.user.role == UserRole.USER
