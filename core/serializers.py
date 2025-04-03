@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
+
 MyUser = get_user_model()
 
 
@@ -43,10 +44,11 @@ class UserProfileUpdate(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'role']
         extra_kwargs = {"password": {"write_only":True, "required": False}}
 
+
 class UserRegistrationSerializer(serializers.ModelSerializer):  
     class Meta:
         model = MyUser
-        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'role']
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
         extra_kwargs = {'password' : {'write_only': True}}
 
     def create(self, validated_data): 
