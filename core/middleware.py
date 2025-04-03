@@ -1,6 +1,5 @@
 import logging
 
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
@@ -11,19 +10,18 @@ MyUser = get_user_model()
 logger = logging.getLogger(__name__)
 
 class CookieJWTAuthMiddleware:
+    """"Middleware to authenticate users using JWT stored in cookies."""
     def __init__(self, get_response):
         self.get_response = get_response
     
     def process_request(self, request):
+        """Process the request to authenticate the user."""
         if request.path == "/api/token/refresh/":
             return None
 
         access_token_key = settings.SIMPLE_JWT.get("AUTH_COOKIE", "access_token")
-        refresh_token_key = "refresh_token"
-
         access_token = request.COOKIES.get(access_token_key)
-        refresh_token = request.COOKIES.get(refresh_token_key)
-
+        
         if not access_token:
             request.user = None
             return None
@@ -37,12 +35,13 @@ class CookieJWTAuthMiddleware:
             request.user = None
 
     def process_response(self, request, response):
+        """Process the response to set the JWT cookie."""
         access_token_key = settings.SIMPLE_JWT.get("AUTH_COOKIE", "access_token")
         refresh_token_key = "refresh_token"
 
         refresh_token = request.COOKIES.get(refresh_token_key)
 
-        if request.user is None and refresh_token:
+        if not request.user and refresh_token:
             try:
                 new_refresh = RefreshToken(refresh_token)
                 new_access_token = str(new_refresh.access_token)
