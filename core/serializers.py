@@ -16,7 +16,7 @@ class UpdatePasswordSerialzier(serializers.ModelSerializer):
     def validate(self, data):
         # Check if the new password is the same as confirm password
         if data['new_password'] != data['confirm_password']:
-            raise serializers.ValidationError("Passwords dont match")
+            raise serializers.ValidationError("Passwords don't match")
         
         # Get the request user
         request = self.context.get('request')
@@ -43,27 +43,12 @@ class UserProfileUpdate(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'role']
         extra_kwargs = {"password": {"write_only":True, "required": False}}
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    
+class UserRegistrationSerializer(serializers.ModelSerializer):  
     class Meta:
         model = MyUser
         fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'role']
         extra_kwargs = {'password' : {'write_only': True}}
 
-    def create(self, validated_data):
-        username = validated_data.get('username')
-        email = validated_data.get('email')
-        password = validated_data.get('password')
-        first_name = validated_data.get('first_name')
-        last_name = validated_data.get('last_name')
-        role = validated_data.get('role')
-    
-        user = MyUser.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            role=role
-        )
+    def create(self, validated_data): 
+        user = MyUser.objects.create_user(**validated_data)
         return user
