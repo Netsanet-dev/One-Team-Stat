@@ -2,7 +2,7 @@ from rest_framework import permissions
 from .models import UserRole
 
 
-class IsLeagueAdmin(permissions.BasePermission):
+class IsLeagueAdmin(permissions.BasePermission):    
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == UserRole.LEAGUE_ADMIN
 
