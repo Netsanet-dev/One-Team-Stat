@@ -12,3 +12,6 @@ class Standing(models.Model):
 
 class PlayerStat(models.Model):
     pass
+
+class GameStat(models.Model):
+    pass
