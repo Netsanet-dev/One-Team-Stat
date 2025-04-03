@@ -10,9 +10,6 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
@@ -36,18 +33,22 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'gamecore.apps.GamecoreConfig',
     'games.apps.GamesConfig',
+    'gamestat.apps.GamestatConfig',
     
     # Third party frameworks
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    # Debug Toolbar Middleware
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+
     # Custom middleware for cookie authentication
     'core.middleware.CookieJWTAuthMiddleware',
-
+    
     # Djago Middlewares
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -81,31 +82,38 @@ WSGI_APPLICATION = 'OneTeamStat.wsgi.application'
 
 
 REST_FRAMEWORK = {
-      'DEFAULT_AUTHENTICATION_CLASSES': [
+      'DEFAULT_AUTHENTICATION_CLASSES': [      
           # Custom django restframework-simple JWT Cookie based authentication
         'core.authentication.CustomCookieJWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-      ],
-}
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        ],
+
+        'DEFAULT_PARSER_CLASSES': [
+            'rest_framework.parsers.JSONParser',
+            'rest_framework.parsers.FormParser', 
+            'rest_framework.parsers.MultiPartParser', 
+    ]
+    }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-
-    "SIGINING_KEY": os.getenv('DJANGO_SECRET_KEY'),
+    
+    "SIGNING_KEY": os.getenv('DJANGO_SECRET_KEY'),
     "VERIFYING_KEY": None,
 
-    "AUTH_HEADER_TYPES": ("Bearer", ),
-
+    "CSRF_COOKIE_SECURE": False,
+    "CSRF_COOKIE_HTTPONLY":  False,
+    "SESSION_COOKIE_SECURE":  False,
+    
+    "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_COOKIE": "access_token",
-    "AUTH_COOKIE_SECURE": True,
+    "AUTH_COOKIE_REFRESH" : "refresh_token",
+    "AUTH_COOKIE_SECURE": False,
     "AUTH_COOKIE_PATH": "/",
-    "AUTH_COOKIE_SAMESITE": "Strict",
+    "AUTH_COOKIE_SAMESITE": "",
     "AUTH_COOKIE_HTTP_ONLY": True,
 
-    "access_token": "access_token",
-    "refresh_token": "refresh_token",
-    
     # Custom Token Claim which adds username, email and role
     "TOKEN_OBTAIN_SERIALIZER": "core.CustomTokenClaim.MyTokenObtainPairSerializer",
 }
@@ -173,3 +181,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
 AUTH_USER_MODEL = 'core.MyUser'
+
+# debug toolbar settings
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
