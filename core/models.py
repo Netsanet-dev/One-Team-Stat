@@ -8,4 +8,4 @@ class UserRole(models.TextChoices):
     USER = 'user', 'Regular User'
 
 class MyUser(AbstractUser):
-   role = models.CharField(max_length=50, choices=UserRole.choices, default=UserRole.USER)
+   role = models.CharField(max_length=20, choices=UserRole.choices, default=UserRole.USER)
