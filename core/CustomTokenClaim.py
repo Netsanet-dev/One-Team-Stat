@@ -1,5 +1,5 @@
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import logging
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -15,4 +15,5 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             token['role'] = user.role
         except AttributeError:            
             logger.error("Token claim have got error.")
+            pass
         return token
