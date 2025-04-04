@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'debug_toolbar',
+    'django-filters'
 ]
 
 MIDDLEWARE = [
@@ -83,17 +84,22 @@ WSGI_APPLICATION = 'OneTeamStat.wsgi.application'
 
 REST_FRAMEWORK = {
       'DEFAULT_AUTHENTICATION_CLASSES': [      
-          # Custom django restframework-simple JWT Cookie based authentication
-        'core.authentication.CustomCookieJWTAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+            # Custom django restframework-simple JWT Cookie based authentication
+            'core.authentication.CustomCookieJWTAuthentication',
+            'rest_framework_simplejwt.authentication.JWTAuthentication',
         ],
 
+        'DEFAULT_FILTER_BACKENDS': [
+            'django_filters.rest_framework.DjangoFilterBackend',
+            'rest_framework.filters.SearchFilter',
+        ],
+        
         'DEFAULT_PARSER_CLASSES': [
             'rest_framework.parsers.JSONParser',
             'rest_framework.parsers.FormParser', 
             'rest_framework.parsers.MultiPartParser', 
-    ]
-    }
+        ]
+        }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
