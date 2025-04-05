@@ -50,7 +50,7 @@ class LeagueVeiwSet(viewsets.ModelViewSet):
                 permission_classes = [IsClubAdmin]
             elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
                 permission_classes = [IsTeamAdmin]
-            elif user.is_authenticated and UserRole.role == UserRole.USER:
+            elif user.is_authenticated and user.role == UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -89,7 +89,7 @@ class SeasonVeiwSet(viewsets.ModelViewSet):
                 permission_classes = [IsClubAdmin]
             elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
                 permission_classes = [IsTeamAdmin]
-            elif user.is_authenticated and UserRole.role == UserRole.USER:
+            elif user.is_authenticated and user.role ==  UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -119,7 +119,7 @@ class ClubVeiwSet(viewsets.ModelViewSet):
             else:
                 permission_classes =[]
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role ==  UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -178,7 +178,7 @@ class CoachVeiwSet(viewsets.ModelViewSet):
             else:
                 permission_classes =[]
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role ==  UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -208,7 +208,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
             else:
                 permission_classes =[]
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role ==  UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -228,7 +228,7 @@ class RefereeViewSet(viewsets.ModelViewSet):
             else:
                 permission_classes =[]
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role ==  UserRole.USER:
                 permission_classes = [IsRegularUser]
             elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
                 permission_classes = [IsClubAdmin]
