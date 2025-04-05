@@ -23,7 +23,7 @@ class League(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{"Male" if self.gender == "M" else "Female"} - {self.name} {self.divison} Division "
+        return f"{'Male' if self.gender == 'M' else 'Female'} - {self.name} {self.divison} Division "
 
 
 class Stadium(models.Model):
@@ -46,7 +46,7 @@ class Season(models.Model):
     current = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{"Current" if self.current else " "} {self.league} From {self.start} to {self.end}'    
+        return f"{'Current' if self.current else ''} {self.league} From {self.start} to {self.end}"    
 
 
 class Club(models.Model):

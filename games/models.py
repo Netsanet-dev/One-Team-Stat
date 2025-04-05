@@ -91,5 +91,5 @@ class MatchStats(models.Model):
     offsides = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
     def __str__(self):
-        return f'Team: {self.team.club.name if self.team else "N/A"}, Fixture: {self.fixture.date_time if self.fixture else "N/A"} '
+        return f"Team: {self.team.club.name if self.team else 'N/A'}, Fixture: {self.fixture.date_time if self.fixture else 'N/A'}"
     
