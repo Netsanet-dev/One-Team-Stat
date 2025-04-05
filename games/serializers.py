@@ -1,67 +1,25 @@
 from rest_framework import serializers
 from gamecore.models import Player, Team
-from .models import Fixtures, Lineups, Substitution, MatchOfficals, GameEvents, MatchStats
+from gamecore.serializers import PlayerSerializer
+from .models import Fixtures, Lineups, Substitution, MatchOfficals, GameEvents, MatchStats, LineupPlayer
 
 
 class FixtureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fixtures
-        fields = ['id', 'date_time', 'league', 'season', 'round', 'stadium', 'home_team', 'away_team', 'home_team_score', 'away_team_score', 'status']
+        fields = ['id', 'date_time', 'league', 'season', 'round', 'stadium', 
+                  'home_team', 'away_team', 'home_team_score', 'away_team_score', 'status']
 
 class LineupSerializer(serializers.ModelSerializer):
-    player_data= serializers.SerializerMethodField()
-    player = serializers.PrimaryKeyRelatedField(queryset=Player.objects.none())
-    
     class Meta:
         model = Lineups
-        fields = ['id', 'fixture','player','player_data', 'starting', 'sub', 'captain']
+        fields = ['id', 'fixture', 'team']
 
-    #1 . Check if a player is not assigned more than  once
-    def get_player_data(self, obj):
-        home_team = obj.fixture.home_team
-        away_team = obj.fixture.away_team
-        players = Player.objects.filter(team__in=[home_team, away_team])
-        print(away_team)
-        return [{'player_id':player.player_id, 'name': player.first_name} for player in players]
+class LineupPlayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LineupPlayer
+        fields = ['id', 'lineup', 'player', 'position', 'is_starter', 'is_captain']
     
-    def validate(self, data):
-        fixture = data.get('fixture')
-        player = data.get('player')
-        starting = data.get('starting')
-        captain = data.get('captain')
-        sub = data.get('sub')
-        if fixture and player:
-            home_team = fixture.home_team
-            away_team = fixture.away_team
-
-            if player.team  not in [home_team, away_team]:
-                raise serializers.ValidationError({'Player Error':"Player is not in the home or away team"})
-            
-            if Lineups.objects.filter(fixture=fixture, player=player):
-                raise serializers.ValidationError({"Lineup Error": "A played already in the starting"})
-            
-            if captain and Lineups.objects.filter(fixture=fixture, captain=True).exists():
-                raise serializers.ValidationError({'Captain Error': 'Captain already assigned.'})
-            
-            if starting and sub:
-                raise serializers.ValidationError({'Startin and Sub Error': 'A player cannot be in both startin and Substitution.'})
-        return data
-    
-    def get_fields(self):
-        fields = super().get_fields()
-        fixture_id = self.context.get('fixture_id')
-        if fixture_id:
-            try:
-                fixture = Fixtures.objects.get(id=fixture_id)
-                home_team = fixture.home_team
-                away_team = fixture.away_team
-                fields['player'].queryset = Player.objects.filter(team__in=[home_team, away_team])
-            except Fixtures.DoesNotExist:
-                pass
-        return fields
-    #2. Check if a one team player is not assigned to other team
-    #3. 
-
 
 class SubstitutionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -108,4 +66,5 @@ class GameEventSerializer(serializers.ModelSerializer):
 class MatchStatSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatchStats
-        fields = ['id', 'fixture', 'team', 'possession', 'total_passes', 'shots', 'shots_on_target', 'shots_off_target', 'fouls', 'corners', 'offsides']
+        fields = ['id', 'fixture', 'team', 'possession', 'total_passes', 'shots', 
+                  'shots_on_target', 'shots_off_target', 'fouls', 'corners', 'offsides']
