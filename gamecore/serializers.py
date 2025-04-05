@@ -9,7 +9,7 @@ from .models import (
     Team,
     Coach,
     Player, 
-    Referee,)
+    Referee)
 
 class LeagueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,13 +58,19 @@ class ClubSerializer(serializers.ModelSerializer):
     class Meta:
         model = Club
         fields = ['id', 'stadium', 'name', 'founded_year']
-
+        
 
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ['id', 'club', 'league', 'division', 'gender']
-
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Team.objects.all(),
+                fields=[ 'club', 'league', 'division', 'gender'],
+                message="The team is already in the club."
+            )
+        ]
 
 class CoachSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,18 +79,18 @@ class CoachSerializer(serializers.ModelSerializer):
 
 
 class PlayerSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all())
-    
     class Meta:
         model = Player
         fields = ['id', 'team', 'first_name', 'last_name', 'gender', 'age', 'nationality', 'dominant_foot', 'positions']
 
     def validate(self, data):
-        team = data.get('id')
+        team = data.get('team')
         player_gender = data.get('gender')
         
+        team_gender = team.gender
+        
         # Check if Team-gender and Player-Gender are the same.
-        if team.gender != player_gender:
+        if team_gender != player_gender:
             raise serializers.ValidationError(f"Team gender {team.gender} is should be the same with Player Gender {player_gender}")
         return data
 
