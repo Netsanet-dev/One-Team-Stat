@@ -5,4 +5,4 @@ from django.shortcuts import render
 # League, League, Stadium, Season, Club, Team, Coach, Player, Referee
 # Fixtures, LineupPlayer, Lineups, substitutions, gamestat, gameevents
 
-# A user want to see
+# filter by fixture, filter by season, 
