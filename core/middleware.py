@@ -60,5 +60,9 @@ class CookieJWTAuthMiddleware:
         return response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        return response
+        """Add cookies to authorization header."""    
+        token = request.COOKIES.get('access_token')
+        if token:
+            request.META['HTTP_AUTHORIZATION'] = f'Bearer {token}'
+        return self.get_response(request)
+      
