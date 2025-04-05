@@ -15,9 +15,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '172.17.0.1', 'localhost']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '172.17.0.1', 'localhost', 'one-team-stat.onrender.com']
 
 
 # Application definition
@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'gamecore.apps.GamecoreConfig',
     'games.apps.GamesConfig',
     'gamestat.apps.GamestatConfig',
+    'corsheaders',
     
     # Third party frameworks
     'rest_framework',
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     
     # Djago Middlewares
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -104,8 +106,8 @@ REST_FRAMEWORK = {
         }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     
     "SIGNING_KEY": os.getenv('DJANGO_SECRET_KEY'),
     "VERIFYING_KEY": None,
@@ -117,7 +119,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_COOKIE": "access_token",
     "AUTH_COOKIE_REFRESH" : "refresh_token",
-    "AUTH_COOKIE_SECURE": False,
+    "AUTH_COOKIE_SECURE": True,
     "AUTH_COOKIE_PATH": "/",
     "AUTH_COOKIE_SAMESITE": "",
     "AUTH_COOKIE_HTTP_ONLY": True,
