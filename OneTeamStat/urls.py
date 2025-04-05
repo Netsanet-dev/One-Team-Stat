@@ -3,7 +3,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from debug_toolbar.toolbar import debug_toolbar_urls
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -47,7 +46,7 @@ urlpatterns = [
     # SimpleJWT Path for token
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-] + debug_toolbar_urls()
+]
 
 # This is for serving static files in developement
 if settings.DEBUG:
