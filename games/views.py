@@ -33,7 +33,7 @@ class FixtureViewSet(ModelViewSet):
                 permission_classes = [IsClubAdmin]
             elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
                 permission_classes = [IsTeamAdmin]
-            elif user.is_authenticated and UserRole.role == UserRole.USER:
+            elif user.is_authenticated and user.role == UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -60,7 +60,7 @@ class LineupViewSet(ModelViewSet):
             else:
                 permission_classes = []
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role == UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -87,7 +87,7 @@ class LineupPlayerViewSet(ModelViewSet):
             else:
                 permission_classes = []
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role == UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -114,7 +114,7 @@ class SubstitutionViewSet(ModelViewSet):
             else:
                 permission_classes = []
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role == UserRole.USER:
                 permission_classes = [IsRegularUser]
             else:
                 permission_classes = []
@@ -132,7 +132,7 @@ class MatchOfficalViewSet(ModelViewSet):
             else:
                 permission_classes =[]
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role == UserRole.USER:
                 permission_classes = [IsRegularUser]
             elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
                 permission_classes = [IsClubAdmin]
@@ -154,7 +154,7 @@ class GameEventViewSet(ModelViewSet):
             else:
                 permission_classes =[]
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role == UserRole.USER:
                 permission_classes = [IsRegularUser]
             elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
                 permission_classes = [IsClubAdmin]
@@ -176,7 +176,7 @@ class MatchStatViewSet(ModelViewSet):
             else:
                 permission_classes =[]
         if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
+            if user.is_authenticated and user.role == UserRole.USER:
                 permission_classes = [IsRegularUser]
             elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
                 permission_classes = [IsClubAdmin]
