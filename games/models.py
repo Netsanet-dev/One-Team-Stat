@@ -1,4 +1,5 @@
 import uuid
+from gamecore.choices import PlayerPositions
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .choices import GameStatus, GameEventType, RefereeRole
@@ -25,14 +26,21 @@ class Fixtures(models.Model):
 class Lineups(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     fixture = models.ForeignKey(Fixtures, on_delete=models.CASCADE, related_name='lineups')
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='lineups')
-    starting = models.BooleanField(default=True)
-    sub = models.BooleanField(default=False)
-    captain = models.BooleanField(default=False)
-
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='lineups')
+    
     def __str__(self):
-        return f'Fixture date: {self.fixture.date_time}'
+        return f'Lineup for {self.team} in {self.fixture}'
 
+class LineupPlayer(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    lineup = models.ForeignKey(Lineups, on_delete=models.CASCADE, related_name='lineups')
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='lineups')
+    position = models.CharField(max_length=10, choices=PlayerPositions.choices, default=PlayerPositions.GK)
+    is_starter = models.BooleanField(default=True)
+    is_captain = models.BooleanField(default=False)
+
+    def  __str__(self):
+        return {f'{self.player.first_name} {self.player.last_name} {self.is_starter} - {'Starter' if self.starting else 'Substitute'}'}
 
 class Substitution(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -42,7 +50,7 @@ class Substitution(models.Model):
     minute = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(135)])
 
     def __str__(self):
-        return f'Sub: {self.player_out.first_name} -> {self.player_out.first_name} at {self.minute}'
+        return f'Sub: {self.player_in.first_name} -> {self.player_out.first_name} at {self.minute}'
 
 
 class MatchOfficals(models.Model):
@@ -52,16 +60,16 @@ class MatchOfficals(models.Model):
     role = models.CharField(max_length=30, choices=RefereeRole.choices, default=RefereeRole.MAIN)
 
     def __str__(self):
-        return f'{self.referee.first_name} - {self.role} in {self.fixtures.date_time}'
+        return f'{self.referee.first_name} - {self.role} in {self.fixture.date_time}'
 
 
 class GameEvents(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    fixture = models.ForeignKey(Fixtures, on_delete=models.CASCADE, related_name='fixtures')
+    fixture = models.ForeignKey(Fixtures, on_delete=models.CASCADE, related_name='events')
     minute = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(135)])
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='game_events')
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='players')
-    assist = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='player_assists')
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='game_events')
+    assist = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='player_assists', null=True, blank=True)
     event_type = models.CharField(max_length=20, choices=GameEventType.choices, default=GameEventType.DEFAULT)
     value = models.IntegerField(default=0)
 
@@ -71,8 +79,8 @@ class GameEvents(models.Model):
 
 class MatchStats(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    fixture = models.ForeignKey(Fixtures, on_delete=models.CASCADE, related_name='players_stat')
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='teams_stat')
+    fixture = models.ForeignKey(Fixtures, on_delete=models.CASCADE, related_name='team_stats')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='teams_stats')
     possession = models.IntegerField(default=50, validators=[MinValueValidator(0), MaxValueValidator(100)])
     total_passes = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     shots = models.IntegerField(default=0, validators=[MinValueValidator(0)])
@@ -84,3 +92,4 @@ class MatchStats(models.Model):
 
     def __str__(self):
         return f'Team: {self.team.club.name if self.team else "N/A"}, Fixture: {self.fixture.date_time if self.fixture else "N/A"} '
+    
