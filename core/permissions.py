@@ -1,19 +1,19 @@
-from rest_framework import permissions
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from .models import UserRole
 
 
-class IsLeagueAdmin(permissions.BasePermission):    
+class IsLeagueAdmin(BasePermission):    
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == UserRole.LEAGUE_ADMIN
 
-class IsClubAdmin(permissions.BasePermission):
+class IsClubAdmin(BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == UserRole.CLUB_ADMIN
 
-class IsTeamAdmin(permissions.BasePermission):
+class IsTeamAdmin(BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == UserRole.TEAM_ADMIN
 
-class IsRegularUser(permissions.BasePermission):
+class IsRegularUser(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == UserRole.USER
+        return request.user and request.user.is_authenticated and request.method in SAFE_METHODS
