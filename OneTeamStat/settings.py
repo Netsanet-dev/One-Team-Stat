@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'gamecore.apps.GamecoreConfig',
     'games.apps.GamesConfig',
     'gamestat.apps.GamestatConfig',
-    'corsheaders',
     
     # Third party frameworks
     'rest_framework',
