@@ -40,21 +40,16 @@ INSTALLED_APPS = [
     # Third party frameworks
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-    'debug_toolbar',
-    'django_filters'
+    'rest_framework_simplejwt.token_blacklist'
 ]
 
 MIDDLEWARE = [
-    # Debug Toolbar Middleware
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 
     # Custom middleware for cookie authentication
     'core.middleware.CookieJWTAuthMiddleware',
     
     # Djago Middlewares
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -94,7 +89,6 @@ REST_FRAMEWORK = {
         ],
 
         'DEFAULT_FILTER_BACKENDS': [
-            'django_filters.rest_framework.DjangoFilterBackend',
             'rest_framework.filters.SearchFilter',
         ],
         
@@ -194,9 +188,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom User Model
 AUTH_USER_MODEL = 'core.MyUser'
 
-# debug toolbar settings
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
