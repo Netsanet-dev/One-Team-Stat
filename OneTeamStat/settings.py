@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'debug_toolbar',
-    'django-filters'
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -86,6 +86,7 @@ REST_FRAMEWORK = {
       'DEFAULT_AUTHENTICATION_CLASSES': [      
             # Custom django restframework-simple JWT Cookie based authentication
             'core.authentication.CustomCookieJWTAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
             'rest_framework_simplejwt.authentication.JWTAuthentication',
         ],
 
