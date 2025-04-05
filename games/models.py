@@ -20,7 +20,7 @@ class Fixtures(models.Model):
     status = models.CharField(max_length=20, choices=GameStatus.choices, default=GameStatus.SCHEDULED)
 
     def __str__(self):
-        return f'Round: {self.round}: {self.home_team.club.name} vs {self.away_team.club.name}'
+        return f" Round: {self.round}: {self.home_team.club.name} vs {self.away_team.club.name}"
 
 
 class Lineups(models.Model):
@@ -29,7 +29,7 @@ class Lineups(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='lineups')
     
     def __str__(self):
-        return f'Lineup for {self.team} in {self.fixture}'
+        return f"Lineup for {self.team} in {self.fixture}"
 
 class LineupPlayer(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -40,7 +40,7 @@ class LineupPlayer(models.Model):
     is_captain = models.BooleanField(default=False)
 
     def  __str__(self):
-        return {f'{self.player.first_name} {self.player.last_name} {self.is_starter} - {'Starter' if self.starting else 'Substitute'}'}
+        return f"{self.player.first_name} {self.player.last_name} {self.is_starter} - {'Starter' if self.starting else 'Substitute'}"
 
 class Substitution(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -50,7 +50,7 @@ class Substitution(models.Model):
     minute = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(135)])
 
     def __str__(self):
-        return f'Sub: {self.player_in.first_name} -> {self.player_out.first_name} at {self.minute}'
+        return f" Sub: {self.player_in.first_name} -> {self.player_out.first_name} at {self.minute}"
 
 
 class MatchOfficals(models.Model):
@@ -60,7 +60,7 @@ class MatchOfficals(models.Model):
     role = models.CharField(max_length=30, choices=RefereeRole.choices, default=RefereeRole.MAIN)
 
     def __str__(self):
-        return f'{self.referee.first_name} - {self.role} in {self.fixture.date_time}'
+        return f"{self.referee.first_name} - {self.role} in {self.fixture.date_time}"
 
 
 class GameEvents(models.Model):
@@ -74,7 +74,7 @@ class GameEvents(models.Model):
     value = models.IntegerField(default=0)
 
     def __str__(self):
-        return f'{self.team} - {self.event_type} by {self.player.first_name} {self.player.last_name} at {self.minute}'    
+        return f"{self.team} - {self.event_type} by {self.player.first_name} {self.player.last_name} at {self.minute}" 
 
 
 class MatchStats(models.Model):
