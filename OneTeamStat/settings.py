@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
 
 # Load Environment Variables
 load_dotenv()
@@ -129,15 +130,17 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PGNAME'),
-        'USER' : os.getenv('PGUSER'),
-        'PASSWORD' : os.getenv('PGPASSWORD'),
-        'HOST' : os.getenv('PGHOST'),
-        'PORT' : os.getenv('PGPORT', '5432')
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': os.getenv('PGNAME'),
+    #     'USER' : os.getenv('PGUSER'),
+    #     'PASSWORD' : os.getenv('PGPASSWORD'),
+    #     'HOST' : os.getenv('PGHOST'),
+    #     'PORT' : os.getenv('PGPORT', '5432')
+    # }
 
-    }
+    # Render database
+    "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 
 
