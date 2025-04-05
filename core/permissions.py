@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import BasePermission
 from .models import UserRole
 
 
@@ -16,4 +16,4 @@ class IsTeamAdmin(BasePermission):
 
 class IsRegularUser(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.method in SAFE_METHODS
+        return request.user and request.user.is_authenticated and request.user.role == UserRole.USER
