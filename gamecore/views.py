@@ -1,6 +1,5 @@
 from rest_framework import  viewsets
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from .models import Referee, League, Stadium, Season, Club, Team, Coach, Player
 from core.permissions import IsLeagueAdmin, IsClubAdmin, IsRegularUser, IsTeamAdmin
 from core.models import UserRole
@@ -18,7 +17,7 @@ from .serializers import (
 
 class LeagueVeiwSet(viewsets.ModelViewSet):
     serializer_class = LeagueSerializer
-
+   
     def get_queryset(self):
         queryset = League.objects.all()
         id = self.request.query_params.get('id', None)
@@ -39,21 +38,11 @@ class LeagueVeiwSet(viewsets.ModelViewSet):
         return queryset
     
     def get_permissions(self):
-        user = self.request.user
-        if self.action in ['create','update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            else:
-                permission_classes =[]
-        if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
-                permission_classes = [IsTeamAdmin]
-            elif user.is_authenticated and user.role == UserRole.USER:
-                permission_classes = [IsRegularUser]
-            else:
-                permission_classes = []
+        permission_classes = []
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create','update', 'partial_update', 'destroy']:
+            permission_classes = [IsLeagueAdmin]
         return [permission() for permission in permission_classes]
 
 class StadiumVeiwSet(viewsets.ModelViewSet):
@@ -61,16 +50,11 @@ class StadiumVeiwSet(viewsets.ModelViewSet):
     serializer_class = StadiumSerializer
 
     def get_permissions(self):
-        user = self.request.user
-        if self.action in ['create','update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            else:
-                permission_classes =[]
-        else:
-            permission_classes = [IsRegularUser]
+        permission_classes = []
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create','update', 'partial_update', 'destroy']:
+            permission_classes = [IsLeagueAdmin]
         return [permission() for permission in permission_classes]
 
 class SeasonVeiwSet(viewsets.ModelViewSet):
@@ -78,21 +62,11 @@ class SeasonVeiwSet(viewsets.ModelViewSet):
     serializer_class = SeasonSerializer
 
     def get_permissions(self):
-        user = self.request.user
-        if self.action in ['create','update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            else:
-                permission_classes =[]
-        if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
-                permission_classes = [IsTeamAdmin]
-            elif user.is_authenticated and user.role ==  UserRole.USER:
-                permission_classes = [IsRegularUser]
-            else:
-                permission_classes = []
+        permission_classes = []
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create','update', 'partial_update', 'destroy']:
+            permission_classes = [IsLeagueAdmin]
         return [permission() for permission in permission_classes]
 
 
@@ -101,58 +75,27 @@ class ClubVeiwSet(viewsets.ModelViewSet):
     serializer_class = ClubSerializer
 
     def get_permissions(self):
-        user = self.request.user
-        if self.action in ['create','update', 'partial_update']:
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
-                permission_classes = [IsTeamAdmin]
-            else:
-                permission_classes =[]
+        permission_classes = []
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create','update', 'partial_update']:
+            permission_classes = [IsClubAdmin|IsLeagueAdmin]
         elif self.action == 'destroy':
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            else:
-                permission_classes =[]
-        if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role ==  UserRole.USER:
-                permission_classes = [IsRegularUser]
-            else:
-                permission_classes = []
+            permission_classes = [IsLeagueAdmin]
+        print(permission_classes)
         return [permission() for permission in permission_classes]
-
+    
 class TeamVeiwSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
     filter_fields = ['name']
 
     def get_permissions(self):
-        user = self.request.user
-        if self.action in ['create','update', 'partial_update']:
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
-                permission_classes = [IsTeamAdmin]
-            else:
-                permission_classes =[]
-        elif self.action == 'destroy':
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            else:
-                permission_classes =[]
-        if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and UserRole.role == UserRole.USER:
-                permission_classes = [IsRegularUser]
-            else:
-                permission_classes = []
+        permission_classes = []
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create','update', 'partial_update', 'destroy']:
+            permission_classes = [IsLeagueAdmin]
         return [permission() for permission in permission_classes]
 
 class CoachVeiwSet(viewsets.ModelViewSet):
@@ -160,28 +103,11 @@ class CoachVeiwSet(viewsets.ModelViewSet):
     serializer_class = CoachSerializer
 
     def get_permissions(self):
-        user = self.request.user
-        if self.action in ['create','update', 'partial_update']:
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
-                permission_classes = [IsTeamAdmin]
-            else:
-                permission_classes =[]
-        elif self.action == 'destroy':
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            else:
-                permission_classes =[]
-        if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role ==  UserRole.USER:
-                permission_classes = [IsRegularUser]
-            else:
-                permission_classes = []
+        permission_classes = []
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create','update', 'partial_update', 'destroy']:
+            permission_classes = [IsLeagueAdmin]
         return [permission() for permission in permission_classes]
 
 
@@ -190,28 +116,11 @@ class PlayerViewSet(viewsets.ModelViewSet):
     serializer_class = PlayerSerializer
 
     def get_permissions(self):
-        user = self.request.user
-        if self.action in ['create','update', 'partial_update']:
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
-                permission_classes = [IsTeamAdmin]
-            else:
-                permission_classes =[]
-        elif self.action == 'destroy':
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            else:
-                permission_classes =[]
-        if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role ==  UserRole.USER:
-                permission_classes = [IsRegularUser]
-            else:
-                permission_classes = []
+        permission_classes = []
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create','update', 'partial_update', 'destroy']:
+            permission_classes = [IsLeagueAdmin]
         return [permission() for permission in permission_classes]
 
 
@@ -221,21 +130,10 @@ class RefereeViewSet(viewsets.ModelViewSet):
     
 
     def get_permissions(self):
-        user = self.request.user
-        if self.action in ['create','update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role == UserRole.LEAGUE_ADMIN:
-                permission_classes = [IsLeagueAdmin]
-            else:
-                permission_classes =[]
-        if self.action not in ['create', 'update', 'partial_update', 'destroy']:
-            if user.is_authenticated and user.role ==  UserRole.USER:
-                permission_classes = [IsRegularUser]
-            elif user.is_authenticated and user.role == UserRole.CLUB_ADMIN:
-                permission_classes = [IsClubAdmin]
-            elif user.is_authenticated and user.role == UserRole.TEAM_ADMIN:
-                permission_classes = [IsTeamAdmin]
-            else:
-                permission_classes = []
+        permission_classes = []
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create','update', 'partial_update', 'destroy']:
+            permission_classes = [IsLeagueAdmin]
         return [permission() for permission in permission_classes]
-
 
