@@ -47,8 +47,13 @@ MIDDLEWARE = [
     # Custom middleware for cookie authentication
     'core.middleware.CookieJWTAuthMiddleware',
     
-    # Djago Middlewares
+    # Djago Middleware
     'django.middleware.security.SecurityMiddleware',
+
+    # White noise Middleware
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
+    # Django Middleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -83,6 +88,8 @@ REST_FRAMEWORK = {
       'DEFAULT_AUTHENTICATION_CLASSES': [      
             # Custom django restframework-simple JWT Cookie based authentication
             'core.authentication.CustomCookieJWTAuthentication',
+
+            # DRF Auth frameworks
             'rest_framework.authentication.SessionAuthentication',
             'rest_framework_simplejwt.authentication.JWTAuthentication',
         ],
@@ -125,6 +132,7 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
+    # Postgresql setup for my local Computer 
     # 'default': {
     #     'ENGINE': 'django.db.backends.postgresql',
     #     'NAME': os.getenv('PGNAME'),
@@ -134,7 +142,7 @@ DATABASES = {
     #     'PORT' : os.getenv('PGPORT', '5432')
     # }
 
-    # Render database
+    # Postgres setup for Render database
     "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 
